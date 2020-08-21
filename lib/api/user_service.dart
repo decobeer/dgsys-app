@@ -17,7 +17,7 @@ class UserService {
   }
 
   Future<UserInfo> getUserData() async {
-    final response = await ApiService().get('user');
+    final response = await ApiService().get('user/');
     if(response.statusCode == 200){
       return UserInfo.fromJson(json.decode(response.body));
     }
@@ -38,12 +38,14 @@ class UserInfo{
   UserInfo({this.username, this.firstName, this.lastName, this.email, this.balance, this.membership});
 
   factory UserInfo.fromJson(Map<String, dynamic> json){
+    print(json);
+
     return UserInfo(
       username: json['username'],
       firstName: json['first_name'],
       lastName: json['last_name'],
       email: json['email'],
-      balance: json['account_balance'],
+      balance: json['account_balance'].toDouble(),
       membership: json['membership_label'],
     );
   }
@@ -54,7 +56,7 @@ class UserInfo{
         firstName: "Anonymous",
         lastName: "",
         email: "",
-        balance: 0,
+        balance: 0.0,
         membership: "Non-Existing"
     );
   }

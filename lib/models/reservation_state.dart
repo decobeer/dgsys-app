@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 
 class ReservationState extends ChangeNotifier{
   List<String> eqCategories;
-  Map<String, Map<String, List<Equipment>>> sortedEquipment;
+  List<Equipment> equipmentArticles;
   Reservation workingReservation;
   bool hasLoaded;
   String error_message;
@@ -73,10 +73,14 @@ class ReservationState extends ChangeNotifier{
 
 
     if (apiService.isSuccess(response.statusCode)) {
+      this.workingReservation = Reservation();
+      notifyListeners();
       return true;
     }
     else{
        this.error_message = json.decode(response.body)['error'];
+       this.workingReservation = Reservation();
+       notifyListeners();
        return false;
     }
   }
@@ -106,10 +110,10 @@ class ReservationState extends ChangeNotifier{
 
   void loadEquipment() async {
     this.hasLoaded = false;
-    this.sortedEquipment =
-        await EquipmentService.getEquipmentByCategoryAndAvaiability(
-          this.workingReservation.startTime,
-          this.workingReservation.endTime);
+    this.equipmentArticles =
+        await EquipmentService.getEquipment(
+          from: this.workingReservation.startTime,
+          to: this.workingReservation.endTime);
 
     this.hasLoaded = true;
     notifyListeners();

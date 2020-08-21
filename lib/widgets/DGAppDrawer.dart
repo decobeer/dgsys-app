@@ -13,6 +13,7 @@ class DGAppDrawer extends StatelessWidget {
             ListTile(
               title: Text("Balance: kr. " + appState.userInfo.balance.toString()),
             ),
+            logoutTile(),
             //screenToggles(appState, ecText),
           ],
         ),

@@ -41,15 +41,8 @@ class ApiService {
     return (response.statusCode == 200);
   }
 
-  Future<http.Response> get(String path, [Map<String, dynamic> query]) async {
-    final uri = Uri(
-      scheme: 'http',
-      host: config.host,
-      port: config.port,
-      path: (config.basePath + path),
-      queryParameters: query
-    );
-
+  Future<http.Response> get(String path, [Map<String, String> query]) async {
+    var uri = Uri.http(config.apiDomain,"/api/"+ path, query);
     var response = await http.get(
         uri,
         headers: {'Authorization': 'Bearer ' + this.tokens.accessToken}
@@ -60,7 +53,7 @@ class ApiService {
     else if (response.statusCode == 401){
       await this.refreshAuth();
       response = await http.get(
-          uri,
+          config.apiBaseUrl + path,
           headers: {'Authorization': 'Bearer ' + this.tokens.accessToken}
       );
       return response;
@@ -95,6 +88,23 @@ class ApiService {
     }
   }
 
+  Future<http.Response> put(String uri, String uriArg, Map data, {bool retryOn401 = true}) async {
+    var response = await http.put(config.apiBaseUrl + uri + "/" + uriArg,
+        headers: {'Authorization': 'Bearer ' + this.tokens.accessToken,
+          "Content-Type": "application/json"},
+        body: jsonEncode(data));
+
+    if (isSuccess(response.statusCode)){
+      return response;
+    }
+    else if(response.statusCode == 401 && retryOn401){
+      return this.put(uri, uriArg, data, retryOn401: false);
+    }
+    else{
+      return response;
+    }
+
+  }
   void logOut(){
     this.tokens = null;
   }

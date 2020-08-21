@@ -119,7 +119,7 @@ class ReservationBody extends StatelessWidget{
                 context: context,
                 initialDate: DateTime.now(),
                 firstDate: DateTime(2018),
-                lastDate: DateTime(2030),
+                lastDate: DateTime(2060),
                 builder: (BuildContext context, Widget child) {
                   return Theme(
                     data: ThemeData.dark(),
@@ -144,7 +144,7 @@ class ReservationBody extends StatelessWidget{
                 context: context,
                 initialDate: DateTime.now(),
                 firstDate: DateTime(2018),
-                lastDate: DateTime(2030),
+                lastDate: DateTime(2060),
                 builder: (BuildContext context, Widget child) {
                   return Theme(
                     data: ThemeData.dark(),
@@ -159,29 +159,13 @@ class ReservationBody extends StatelessWidget{
       )
     ];
 
-    if(reservation.sortedEquipment != null && reservation.hasLoaded){
-      for (String mapKey in reservation.sortedEquipment.keys){
-        var articles = List<Equipment>();
-        if(reservation.sortedEquipment[mapKey]['available'] != null){
-          articles.addAll(reservation.sortedEquipment[mapKey]['available']);
-        }
-        if(reservation.sortedEquipment[mapKey]['occupied'] != null) {
-          articles.addAll(reservation.sortedEquipment[mapKey]['occupied']);
-        }
-        content.add(
-          ExpansionTile(
-              title: Text(mapKey),
-              children: articles.map((e) =>
-                  EquipmentListItem(
-                    item: e,
-                    onPressed: (){toggleSelection(e, context);},
-                    isSelected: reservation.workingReservation.selectedEquipment.contains(e),
-                    selectableOnOccupied: false,
-                  )
-              ).toList()
-          )
-        );
-      } //
+    if(reservation.equipmentArticles != null && reservation.hasLoaded){
+      content.add(EquipmentList(
+        equipmentArticles: reservation.equipmentArticles,
+        selectedItems: reservation.workingReservation.selectedEquipment,
+        onItemPressed: this.toggleSelection,
+        selectableOnReserved: false,
+      ));
     }
 
     return content;
@@ -192,7 +176,7 @@ class ReservationBody extends StatelessWidget{
     if (reservation.workingReservation.selectedEquipment.contains(e)){
       reservation.removeEquipment(e);
     }
-    else if(e.available){
+    else if(e.isAvailable()){
       reservation.addEquipment(e);
     }
   }

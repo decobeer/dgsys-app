@@ -25,6 +25,16 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void refresh(){
+    this.updateUserInfo();
+  }
+  void updateUserInfo() async {
+    if(this.isAuthenticated){
+      this.userInfo = await UserService().getUserData();
+      notifyListeners();
+    }
+  }
+
   void logOut() {
     apiService.logOut();
     this.isAuthenticated = false;
